@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`check Input component check expect match children 1`] = `
+<div
+  className="MuiFormControl-root-2 MuiFormControl-marginDense-4 Input-textField-1"
+>
+  <label
+    className="MuiFormLabel-root-17 MuiInputLabel-root-6 MuiInputLabel-formControl-11 MuiInputLabel-animated-14 MuiInputLabel-marginDense-12"
+    data-shrink={false}
+  >
+    test label
+  </label>
+  <div
+    className="MuiInputBase-root-37 MuiInput-root-24 MuiInput-underline-28 MuiInputBase-formControl-38 MuiInput-formControl-25 MuiInputBase-marginDense-44"
+    onClick={[Function]}
+  >
+    <input
+      aria-invalid={false}
+      className="MuiInputBase-input-47 MuiInput-input-32 MuiInputBase-inputMarginDense-48 MuiInput-inputMarginDense-33"
+      classes={
+        Object {
+          "textField": "Input-textField-1",
+        }
+      }
+      disabled={false}
+      label="test label"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholder="test"
+      required={false}
+      type="text"
+    />
+  </div>
+</div>
+`;
+
+exports[`check Input component check expect match snapshot 1`] = `
+<div
+  className="MuiFormControl-root-2 MuiFormControl-marginDense-4 Input-textField-1"
+>
+  <label
+    className="MuiFormLabel-root-17 MuiInputLabel-root-6 MuiInputLabel-formControl-11 MuiInputLabel-animated-14 MuiInputLabel-marginDense-12"
+    data-shrink={false}
+  >
+    test label
+  </label>
+  <div
+    className="MuiInputBase-root-37 MuiInput-root-24 MuiInput-underline-28 MuiInputBase-formControl-38 MuiInput-formControl-25 MuiInputBase-marginDense-44"
+    onClick={[Function]}
+  >
+    <input
+      aria-invalid={false}
+      className="MuiInputBase-input-47 MuiInput-input-32 MuiInputBase-inputMarginDense-48 MuiInput-inputMarginDense-33"
+      classes={
+        Object {
+          "textField": "Input-textField-1",
+        }
+      }
+      disabled={false}
+      label="test label"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholder="test"
+      required={false}
+      type="text"
+    />
+  </div>
+</div>
+`;

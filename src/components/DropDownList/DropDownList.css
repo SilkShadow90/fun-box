@@ -1,0 +1,21 @@
+.drop-down {
+    overflow-y: auto;
+}
+
+.drop-down__list {
+    padding: 0 0.5rem;
+}
+
+.drop-down__list__item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.drop-down__list .drop-down__list__item_remove {
+    min-width: auto;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+}
