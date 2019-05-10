@@ -29,12 +29,16 @@ export default class Map extends Component {
 
     this.state = {
       mapWidth: '80vw',
+      mapHeight: '100vh',
       mapReady: false,
       isPolylineVisible: true,
+      isSmallScreen: false,
     };
   }
 
   componentDidMount() {
+    window.addEventListener('resize', this.resize);
+    this.resize();
     if (!this.checkMapInstanceReady()) {
       this.forceUpdate();
     } else {
@@ -44,7 +48,13 @@ export default class Map extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { isSidebarOpen } = this.props;
-    const { mapWidth, mapReady } = this.state;
+    const {
+      mapWidth,
+      mapReady,
+      isSmallScreen,
+      mapHeight,
+    } = this.state;
+
     const mapInstanceReady = this.checkMapInstanceReady();
 
     if (!mapInstanceReady) {
@@ -56,16 +66,31 @@ export default class Map extends Component {
     if (mapInstanceReady && !prevState.mapReady && mapReady) {
       this.setMapEvents();
     }
-    if (mapWidth === '80vw' && !isSidebarOpen) {
+    if ((mapWidth === '80vw' && !isSidebarOpen)
+      || (isSmallScreen && mapWidth === '80vw')) {
       this.setMapWidth(100);
     }
 
-    if (mapWidth === '100vw' && isSidebarOpen) {
+    if (mapWidth === '100vw' && isSidebarOpen && !isSmallScreen) {
       setTimeout(() => {
         this.setMapWidth(80);
       }, 1000);
     }
+
+    if (mapHeight === '50wh' && !isSidebarOpen && isSmallScreen) {
+      this.setMapHeight(100);
+    }
+
+    if (mapHeight === '100wh' && isSidebarOpen && isSmallScreen) {
+      setTimeout(() => {
+        this.setMapHeight(50);
+      }, 1000);
+    }
   }
+
+  resize = () => {
+    this.setState({ isSmallScreen: window.innerWidth <= 760 });
+  };
 
   setMapReady = () => {
     this.setState({ mapReady: true });
@@ -73,6 +98,10 @@ export default class Map extends Component {
 
   setMapWidth = (width) => {
     this.setState({ mapWidth: `${width}vw` });
+  };
+
+  setMapHeight = (height) => {
+    this.setState({ mapHeight: `${height}vh` });
   };
 
   setMapEvents = () => {
@@ -97,13 +126,33 @@ export default class Map extends Component {
 
   placeMarkDragEnd = placeMarkId => (e) => {
     const { setNewPlaceMarkPosition } = this.props;
-    const newPosition = e.get('target').geometry.getCoordinates();
+    const placeMark = e.get('target');
+    const newPosition = placeMark.geometry.getCoordinates();
+    this.setAddressToPlaceMark(placeMark);
+
     setNewPlaceMarkPosition(newPosition, placeMarkId);
     this.switchPolylineVisible();
   };
 
-  placeMarkAddedEvents = placeMarkId => (placeMark) => {
+  setAddressToPlaceMark = async (placeMark) => {
+    if (this.mapAPI) {
+      const position = placeMark.geometry.getCoordinates();
+      try {
+        const positionGeoCode = await this.mapAPI.geocode(position);
+        const firstGeoObject = positionGeoCode.geoObjects.get(0);
+
+        placeMark.properties.set({
+          balloonContentBody: firstGeoObject.getAddressLine(),
+        });
+      } catch (e) {
+        throw new Error(e);
+      }
+    }
+  };
+
+  placeMarkAddedEvents = placeMarkId => async (placeMark) => {
     if (placeMark && placeMark.events && placeMark.events.types) {
+      await this.setAddressToPlaceMark(placeMark);
       if (!placeMark.events.types.beforedragstart && !placeMark.events.types.beforeddragend) {
         placeMark.events.add('beforedragstart', this.switchPolylineVisible);
         placeMark.events.add('dragend', this.placeMarkDragEnd(placeMarkId));
@@ -116,9 +165,11 @@ export default class Map extends Component {
       key={placeMark.id}
       instanceRef={this.placeMarkAddedEvents(placeMark.id)}
       modules={['geoObject.addon.balloon']}
-      defaultGeometry={placeMark.position}
+      geometry={{
+        coordinates: placeMark.position,
+      }}
       properties={{
-        balloonContentBody: placeMark.content,
+        balloonContentHeader: placeMark.content,
       }}
       options={{
         draggable: true,
@@ -133,7 +184,9 @@ export default class Map extends Component {
 
     return (
       <Polyline
-        geometry={placeMarkRoute}
+        geometry={{
+          coordinates: placeMarkRoute,
+        }}
         options={{
           balloonCloseButton: false,
           strokeColor: '#333333',
@@ -149,16 +202,18 @@ export default class Map extends Component {
 
   render() {
     const { placeMarkList, placeMarkRoute } = this.props;
-    const { mapWidth } = this.state;
+    const { mapWidth, mapHeight } = this.state;
 
     return (
-      <YMaps>
+      <YMaps version="2.1" onApiAvaliable={(map) => { this.mapAPI = map; }}>
         <YMap
-          instanceRef={(map) => { this.mapInstance = map; }}
+          instanceRef={(map) => {
+            this.mapInstance = map;
+          }}
           className={classNames('map')}
-          style={{ width: mapWidth }}
           width={mapWidth}
-          defaultState={this.mapDefaultState}
+          height={mapHeight}
+          state={this.mapDefaultState}
           modules={['control.ZoomControl']}
         >
           {placeMarkList && placeMarkList.map(this.renderPlaceMark)}
