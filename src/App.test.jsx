@@ -7,9 +7,7 @@ import { Sidebar, Map } from './components';
 describe('check App', () => {
   const renderer = new ShallowRenderer();
 
-  renderer.render(
-    <App />,
-  );
+  renderer.render(<App />);
   const result = renderer.getRenderOutput();
 
   test('check expect type', () => {

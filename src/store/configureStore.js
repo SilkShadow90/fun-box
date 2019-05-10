@@ -5,7 +5,6 @@ import { createLogger } from 'redux-logger';
 import rootReducer from './rootReducer';
 import reduxMiddleware from './reduxMiddleware';
 
-
 const logger = createLogger({
   level: 'info',
   collapsed: false,
